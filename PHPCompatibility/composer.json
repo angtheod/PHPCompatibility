@@ -4,8 +4,10 @@
   "require" : {
     "php" : ">=5.1.2",
     "ext-tokenizer" : "*",
-    "squizlabs/php_codesniffer" : ">=1.5.1,<2.0",
-    "simplyadmire/composer-plugins" : "@dev"
+    "squizlabs/php_codesniffer" : ">=1.5.1,<=2.3.2"
+  },
+  "require-dev": {
+    "satooshi/php-coveralls": "dev-master"
   },
   "authors" : [ {
     "name" : "Wim Godden",
@@ -17,6 +19,6 @@
   },
   "keywords" : [ "compatibility", "phpcs", "standards" ],
   "license" : "LGPL",
-  "type" : "library",
+  "type" : "phpcodesniffer-standard",
   "homepage" : "http://techblog.wimgodden.be/tag/codesniffer/"
 }
