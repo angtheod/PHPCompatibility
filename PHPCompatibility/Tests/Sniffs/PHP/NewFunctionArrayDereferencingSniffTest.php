@@ -22,15 +22,35 @@ class NewFunctionArrayDereferencingSniffTest extends BaseSniffTest
      *
      * @group functionArrayDereferencing
      *
+     * @dataProvider dataArrayDereferencing
+     *
+     * @param int $line Line number with valid code.
+     *
      * @return void
      */
-    public function testArrayDereferencing()
+    public function testArrayDereferencing($line)
     {
         $file = $this->sniffFile(self::TEST_FILE, '5.3');
-        $this->assertError($file, 3, 'Function array dereferencing is not present in PHP version 5.3 or earlier');
+        $this->assertError($file, $line, 'Function array dereferencing is not present in PHP version 5.3 or earlier');
 
         $file = $this->sniffFile(self::TEST_FILE, '5.4');
-        $this->assertNoViolation($file, 3);
+        $this->assertNoViolation($file, $line);
+    }
+
+    /**
+     * dataArrayDereferencing
+     *
+     * @see testArrayDereferencing()
+     *
+     * @return array
+     */
+    public function dataArrayDereferencing() {
+        return array(
+            array(3),
+            array(14),
+            array(15),
+            array(16),
+        );
     }
 
 
@@ -47,7 +67,7 @@ class NewFunctionArrayDereferencingSniffTest extends BaseSniffTest
      */
     public function testNoViolation($line)
     {
-        $file = $this->sniffFile(self::TEST_FILE);
+        $file = $this->sniffFile(self::TEST_FILE, '5.2');
         $this->assertNoViolation($file, $line);
     }
 
@@ -61,7 +81,11 @@ class NewFunctionArrayDereferencingSniffTest extends BaseSniffTest
     public function dataNoViolation() {
         return array(
             array(5),
-            array(6),
+            array(8),
+            array(9),
+            array(10),
+            array(11),
+            array(19),
         );
     }
 }

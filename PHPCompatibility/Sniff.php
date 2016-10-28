@@ -76,7 +76,7 @@ abstract class PHPCompatibility_Sniff implements PHP_CodeSniffer_Sniff
             return $arrTestVersions[$testVersion];
         }
         else {
-			return array(null, null);
+            return array(null, null);
         }
     }
 
@@ -108,6 +108,21 @@ abstract class PHPCompatibility_Sniff implements PHP_CodeSniffer_Sniff
         }
     }//end supportsBelow()
 
+
+    /**
+     * Strip quotes surrounding an arbitrary string.
+     *
+     * Intended for use with the content of a T_CONSTANT_ENCAPSED_STRING.
+     *
+     * @param string $string The raw string.
+     *
+     * @return string String without quotes around it.
+     */
+    public function stripQuotes($string) {
+        return preg_replace('`^([\'"])(.*)\1$`Ds', '$2', $string);
+    }
+
+
     /**
      * Returns the name(s) of the interface(s) that the specified class implements.
      *
@@ -123,8 +138,12 @@ abstract class PHPCompatibility_Sniff implements PHP_CodeSniffer_Sniff
      *
      * @return array|false
      */
-    public function findImplementedInterfaceNames($phpcsFile, $stackPtr)
+    public function findImplementedInterfaceNames(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
     {
+        if (method_exists($phpcsFile, 'findImplementedInterfaceNames')) {
+            return $phpcsFile->findImplementedInterfaceNames($stackPtr);
+        }
+
         $tokens = $phpcsFile->getTokens();
 
         // Check for the existence of the token.
@@ -554,8 +573,8 @@ abstract class PHPCompatibility_Sniff implements PHP_CodeSniffer_Sniff
         if ($tokens[$stackPtr - 1]['code'] === T_SELF) {
             $classDeclarationPtr = $phpcsFile->findPrevious(T_CLASS, $stackPtr - 1);
             if ($classDeclarationPtr === false) {
-				return '';
-			}
+                return '';
+            }
             $className = $phpcsFile->getDeclarationName($classDeclarationPtr);
             return $this->getFQName($phpcsFile, $classDeclarationPtr, $className);
         }
@@ -652,8 +671,8 @@ abstract class PHPCompatibility_Sniff implements PHP_CodeSniffer_Sniff
                     if ($namespace !== false) {
                         return $namespace;
                     }
+                    break; // Nested namespaces is not possible.
                 }
-                break; // We only need to check the highest level condition.
             }
         }
 
@@ -766,7 +785,7 @@ abstract class PHPCompatibility_Sniff implements PHP_CodeSniffer_Sniff
      * @param int $stackPtr The position in the stack of the T_FUNCTION token
      *                      to acquire the parameters for.
      *
-     * @return array
+     * @return array|false
      * @throws PHP_CodeSniffer_Exception If the specified $stackPtr is not of
      *                                   type T_FUNCTION.
      */

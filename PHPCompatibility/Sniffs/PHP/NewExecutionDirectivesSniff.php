@@ -123,7 +123,7 @@ class PHPCompatibility_Sniffs_PHP_NewExecutionDirectivesSniff extends PHPCompati
                 return;
             }
 
-            $this->addErrorOnInvalidValue($phpcsFile, $valuePtr, $directiveContent);
+            $this->addWarningOnInvalidValue($phpcsFile, $valuePtr, $directiveContent);
         }
 
     }//end process()
@@ -193,13 +193,13 @@ class PHPCompatibility_Sniffs_PHP_NewExecutionDirectivesSniff extends PHPCompati
      *
      * @return void
      */
-    protected function addErrorOnInvalidValue($phpcsFile, $stackPtr, $directive)
+    protected function addWarningOnInvalidValue($phpcsFile, $stackPtr, $directive)
     {
         $tokens = $phpcsFile->getTokens();
 
         $value = $tokens[$stackPtr]['content'];
         if ($tokens[$stackPtr]['code'] === T_CONSTANT_ENCAPSED_STRING) {
-            $value = trim($value, '\'"');
+            $value = $this->stripQuotes($value);
         }
 
         $isError = false;
@@ -221,7 +221,7 @@ class PHPCompatibility_Sniffs_PHP_NewExecutionDirectivesSniff extends PHPCompati
                 $directive,
                 $value,
             );
-            $phpcsFile->addError($error, $stackPtr, 'InvalidDirectiveValueFound', $data);
+            $phpcsFile->addWarning($error, $stackPtr, 'InvalidDirectiveValueFound', $data);
         }
     }// addErrorOnInvalidValue()
 

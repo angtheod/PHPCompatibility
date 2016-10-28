@@ -135,17 +135,19 @@ class PHPCompatibility_Sniffs_PHP_NewInterfacesSniff extends PHPCompatibility_Sn
             if ($checkMethods === true && isset($this->unsupportedMethods[$lcInterface]) === true) {
                 $nextFunc = $stackPtr;
                 while (($nextFunc = $phpcsFile->findNext(T_FUNCTION, ($nextFunc + 1), $scopeCloser)) !== false) {
-                    $funcNamePos = $phpcsFile->findNext(T_STRING, $nextFunc);
-                    $funcName    = strtolower($tokens[$funcNamePos]['content']);
+                    $funcName = strtolower($phpcsFile->getDeclarationName($nextFunc));
+                    if (is_string($funcName) === false) {
+                        continue;
+                    }
 
                     if (isset($this->unsupportedMethods[$lcInterface][$funcName]) === true) {
                         $error = 'Classes that implement interface %s do not support the method %s(). See %s';
                         $data  = array(
                             $interface,
-                            $tokens[$funcNamePos]['content'],
+                            $funcName,
                             $this->unsupportedMethods[$lcInterface][$funcName],
                         );
-                        $phpcsFile->addError($error, $funcNamePos, 'UnsupportedMethod', $data);
+                        $phpcsFile->addError($error, $nextFunc, 'UnsupportedMethod', $data);
                     }
                 }
             }
@@ -161,20 +163,16 @@ class PHPCompatibility_Sniffs_PHP_NewInterfacesSniff extends PHPCompatibility_Sn
      * @param int                  $stackPtr  The position of the function
      *                                        in the token array.
      * @param string               $interface The name of the interface.
-     * @param string               $pattern   The pattern used for the match.
      *
      * @return void
      */
-    protected function addError($phpcsFile, $stackPtr, $interface, $pattern=null)
+    protected function addError($phpcsFile, $stackPtr, $interface)
     {
-        if ($pattern === null) {
-            $pattern = strtolower($interface);
-        }
-
-        $error = '';
+        $interfaceLc = strtolower($interface);
+        $error       = '';
 
         $isError = false;
-        foreach ($this->newInterfaces[$pattern] as $version => $present) {
+        foreach ($this->newInterfaces[$interfaceLc] as $version => $present) {
             if ($this->supportsBelow($version)) {
                 if ($present === false) {
                     $isError = true;

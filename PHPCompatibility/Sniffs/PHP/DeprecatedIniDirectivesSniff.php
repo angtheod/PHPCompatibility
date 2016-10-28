@@ -222,7 +222,7 @@ class PHPCompatibility_Sniffs_PHP_DeprecatedIniDirectivesSniff extends PHPCompat
         }
 
         $function = strtolower($tokens[$stackPtr]['content']);
-        if ($function != 'ini_get' && $function != 'ini_set') {
+        if ($function !== 'ini_get' && $function !== 'ini_set') {
             return;
         }
 
@@ -231,7 +231,7 @@ class PHPCompatibility_Sniffs_PHP_DeprecatedIniDirectivesSniff extends PHPCompat
             return;
         }
 
-        $filteredToken = trim($iniToken['raw'], '\'"');
+        $filteredToken = $this->stripQuotes($iniToken['raw']);
         if (isset($this->deprecatedIniDirectives[$filteredToken]) === false) {
             return;
         }
