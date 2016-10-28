@@ -1,12 +1,12 @@
 <?php
 /**
- * Default timezone sniff test file
+ * PHP4 style constructors sniff test file
  *
  * @package PHPCompatibility
  */
 
 /**
- * Default timezone required sniff test
+ * PHP4 style constructors sniff test
  *
  * @uses BaseSniffTest
  * @package PHPCompatibility
@@ -15,7 +15,9 @@
 class DeprecatedPHP4StyleConstructorsSniffTest extends BaseSniffTest
 {
     /**
-     * Test PHP4 style constructors
+     * Test PHP4 style constructors.
+     *
+     * @group deprecatedPHP4Constructors
      *
      * @return void
      */
@@ -26,5 +28,19 @@ class DeprecatedPHP4StyleConstructorsSniffTest extends BaseSniffTest
 
         $file = $this->sniffFile('sniff-examples/deprecated_php4style_constructors.php', '7.0');
         $this->assertError($file, 3, 'Deprecated PHP4 style constructor are not supported since PHP7');
+    }
+
+    /**
+     * Test valid methods with the same name as the class.
+     *
+     * @group deprecatedPHP4Constructors
+     *
+     * @return void
+     */
+    public function testValidMethods()
+    {
+        $file = $this->sniffFile('sniff-examples/deprecated_php4style_constructors.php', '7.0');
+        $this->assertNoViolation($file, 9);
+        $this->assertNoViolation($file, 20);
     }
 }

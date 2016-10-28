@@ -8,7 +8,7 @@
 /**
  * BaseSniffTest
  *
- * Adds PHPCS sniffing logic and custom assertions for PHPCS errors and 
+ * Adds PHPCS sniffing logic and custom assertions for PHPCS errors and
  * warnings
  *
  * @uses PHPUnit_Framework_TestCase
@@ -37,7 +37,7 @@ class BaseSniffTest extends PHPUnit_Framework_TestCase
 
         PHP_CodeSniffer::setConfigData('testVersion', null, true);
         if (method_exists('PHP_CodeSniffer_CLI', 'setCommandLineValues')) { // For PHPCS 2.x
-            self::$phpcs->cli->setCommandLineValues(array('-p', '--colors'));
+            self::$phpcs->cli->setCommandLineValues(array('-pq', '--colors'));
         }
 
         self::$phpcs->process(array(), __DIR__ . '/../');
@@ -60,7 +60,7 @@ class BaseSniffTest extends PHPUnit_Framework_TestCase
      *
      * @param string $filename Filename to sniff
      * @param string $targetPhpVersion Value of 'testVersion' to set on PHPCS object
-     * @return PHP_CodeSniffer_File File object
+     * @return PHP_CodeSniffer_File File object|false
      */
     public function sniffFile($filename, $targetPhpVersion = null)
     {
@@ -78,7 +78,7 @@ class BaseSniffTest extends PHPUnit_Framework_TestCase
 
         return $phpcsFile;
     }
-    
+
     /**
      * Assert a PHPCS error on a particular line number
      *
@@ -91,23 +91,7 @@ class BaseSniffTest extends PHPUnit_Framework_TestCase
     {
         $errors = $this->gatherErrors($file);
 
-        if (!isset($errors[$lineNumber])) {
-            throw new Exception("Expected error '$expectedMessage' on line number $lineNumber, but none found.");
-        }
-
-        $foundExpectedMessage = false;
-        $insteadFoundMessages = array();
-
-        // Concat any error messages so we can do an assertContains
-        foreach ($errors[$lineNumber] as $error) {
-            $insteadFoundMessages[] = $error['message'];
-        }
-
-        $insteadMessagesString = implode(', ', $insteadFoundMessages);
-        return $this->assertContains(
-            $expectedMessage, $insteadMessagesString,
-            "Expected error message '$expectedMessage' on line $lineNumber not found. Instead found: $insteadMessagesString."
-        );
+        return $this->assertForType($errors, 'error', $lineNumber, $expectedMessage);
     }
 
     /**
@@ -122,22 +106,35 @@ class BaseSniffTest extends PHPUnit_Framework_TestCase
     {
         $warnings = $this->gatherWarnings($file);
 
-        if (!isset($warnings[$lineNumber])) {
-            throw new Exception("Expected warning '$expectedMessage' on line number $lineNumber, but none found.");
+        return $this->assertForType($warnings, 'warning', $lineNumber, $expectedMessage);
+    }
+
+    /**
+     * Assert a PHPCS error or warning on a particular line number.
+     *
+     * @param array  $issues          Array of issues of a particular type.
+     * @param string $type            The type of issues, either 'error' or 'warning'.
+     * @param int    $lineNumber      Line number.
+     * @param string $expectedMessage Expected message (assertContains).
+     * @return bool
+     */
+    private function assertForType($issues, $type, $lineNumber, $expectedMessage)
+    {
+        if (!isset($issues[$lineNumber])) {
+            throw new Exception("Expected $type '$expectedMessage' on line number $lineNumber, but none found.");
         }
 
-        $foundExpectedMessage = false;
         $insteadFoundMessages = array();
 
         // Concat any error messages so we can do an assertContains
-        foreach ($warnings[$lineNumber] as $warning) {
-            $insteadFoundMessages[] = $warning['message'];
+        foreach ($issues[$lineNumber] as $issue) {
+            $insteadFoundMessages[] = $issue['message'];
         }
 
         $insteadMessagesString = implode(', ', $insteadFoundMessages);
         return $this->assertContains(
             $expectedMessage, $insteadMessagesString,
-            "Expected warning message '$expectedMessage' on line $lineNumber not found. Instead found: $insteadMessagesString."
+            "Expected $type message '$expectedMessage' on line $lineNumber not found. Instead found: $insteadMessagesString."
         );
     }
 
@@ -159,7 +156,7 @@ class BaseSniffTest extends PHPUnit_Framework_TestCase
 
         if ($lineNumber == 0) {
             $allMessages = $errors + $warnings;
-            // TODO: Update the fail message to give the tester some 
+            // TODO: Update the fail message to give the tester some
             // indication of what the errors or warnings were
             return $this->assertEmpty($allMessages, 'Failed asserting no violations in file');
         }
@@ -189,7 +186,7 @@ class BaseSniffTest extends PHPUnit_Framework_TestCase
 
     /**
      * Show violations in file by line number
-     * 
+     *
      * This is useful for debugging sniffs on a file
      *
      * @param PHP_CodeSniffer_File $file Codesniffer file object
@@ -215,21 +212,7 @@ class BaseSniffTest extends PHPUnit_Framework_TestCase
     {
         $foundErrors = $file->getErrors();
 
-        $allErrors = array();
-        foreach ($foundErrors as $line => $lineErrors) {
-            foreach ($lineErrors as $column => $errors) {
-                foreach ($errors as $error) {
-
-                    if (!isset($allErrors[$line])) {
-                        $allErrors[$line] = array();
-                    }
-
-                    $allErrors[$line][] = $error;
-                }
-            }
-        }
-
-        return $allErrors;
+        return $this->gatherIssues($foundErrors);
     }
 
     /**
@@ -242,21 +225,33 @@ class BaseSniffTest extends PHPUnit_Framework_TestCase
     {
         $foundWarnings = $file->getWarnings();
 
-        $allWarnings = array();
-        foreach ($foundWarnings as $line => $lineWarnings) {
-            foreach ($lineWarnings as $column => $warnings) {
-                foreach ($warnings as $warning) {
+        return $this->gatherIssues($foundWarnings);
+    }
+    
+    /**
+     * Gather all messages or a particular type by line number.
+     *
+     * @param array $IssuesArray Array of a particular type of issues,
+	 *                           i.e. errors or warnings.
+     * @return array
+     */
+    private function gatherIssues($issuesArray)
+    {
+        $allIssues = array();
+        foreach ($issuesArray as $line => $lineIssues) {
+            foreach ($lineIssues as $column => $issues) {
+                foreach ($issues as $issue) {
 
-                    if (!isset($allWarnings[$line])) {
-                        $allWarnings[$line] = array();
+                    if (!isset($allIssues[$line])) {
+                        $allIssues[$line] = array();
                     }
 
-                    $allWarnings[$line][] = $warning;
+                    $allIssues[$line][] = $issue;
                 }
             }
         }
 
-        return $allWarnings;
+        return $allIssues;
     }
 }
 

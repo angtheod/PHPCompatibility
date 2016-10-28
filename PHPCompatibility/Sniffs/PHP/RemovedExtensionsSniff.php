@@ -48,8 +48,8 @@ class PHPCompatibility_Sniffs_PHP_RemovedExtensionsSniff extends PHPCompatibilit
     protected $removedExtensions = array(
         'activescript' => array(
                 '5.0' => 1,
-                '5.1' => 1,
-                '5.2' => 1,
+                '5.1' => 0,
+                '5.2' => 0,
                 '5.3' => 0,
                 '5.4' => 0,
                 '5.5' => 0,
@@ -59,8 +59,8 @@ class PHPCompatibility_Sniffs_PHP_RemovedExtensionsSniff extends PHPCompatibilit
         ),
         'cpdf' => array(
                 '5.0' => 1,
-                '5.1' => 1,
-                '5.2' => 1,
+                '5.1' => 0,
+                '5.2' => 0,
                 '5.3' => 0,
                 '5.4' => 0,
                 '5.5' => 0,
@@ -105,8 +105,12 @@ class PHPCompatibility_Sniffs_PHP_RemovedExtensionsSniff extends PHPCompatibilit
                 '5.0' => 1,
                 '5.1' => 1,
                 '5.2' => 1,
+                '5.3' => -1,
+                '5.4' => -1,
+                '5.5' => -1,
+                '5.6' => -1,
                 '7.0' => 0,
-                'alternative' => null
+                'alternative' => 'pcre'
         ),
         'fam' => array(
                 '5.0' => 1,
@@ -176,8 +180,8 @@ class PHPCompatibility_Sniffs_PHP_RemovedExtensionsSniff extends PHPCompatibilit
         ),
         'ircg' => array(
                 '5.0' => 1,
-                '5.1' => 1,
-                '5.2' => 1,
+                '5.1' => 0,
+                '5.2' => 0,
                 '5.3' => 0,
                 '5.4' => 0,
                 '5.5' => 0,
@@ -257,8 +261,8 @@ class PHPCompatibility_Sniffs_PHP_RemovedExtensionsSniff extends PHPCompatibilit
         ),
         'oracle' => array(
                 '5.0' => 1,
-                '5.1' => 1,
-                '5.2' => 1,
+                '5.1' => 0,
+                '5.2' => 0,
                 '5.3' => 0,
                 '5.4' => 0,
                 '5.5' => 0,
@@ -327,8 +331,8 @@ class PHPCompatibility_Sniffs_PHP_RemovedExtensionsSniff extends PHPCompatibilit
         ),
         'yp' => array(
                 '5.0' => 1,
-                '5.1' => 1,
-                '5.2' => 1,
+                '5.1' => 0,
+                '5.2' => 0,
                 '5.3' => 0,
                 '5.4' => 0,
                 '5.5' => 0,

@@ -133,10 +133,6 @@ class PHPCompatibility_Sniffs_PHP_NewClassesSniff extends PHPCompatibility_Sniff
                                             '5.3' => false,
                                             '5.4' => true
                                         ),
-                                        'JsonSerializable' => array(
-                                            '5.3' => false,
-                                            '5.4' => true
-                                        ),
                                         'SessionHandler' => array(
                                             '5.3' => false,
                                             '5.4' => true
@@ -197,7 +193,11 @@ class PHPCompatibility_Sniffs_PHP_NewClassesSniff extends PHPCompatibility_Sniff
      */
     public function register()
     {
-        return array(T_NEW);
+        return array(
+                T_NEW,
+                T_CLASS,
+                T_DOUBLE_COLON,
+               );
 
     }//end register()
 
@@ -213,41 +213,45 @@ class PHPCompatibility_Sniffs_PHP_NewClassesSniff extends PHPCompatibility_Sniff
      */
     public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
     {
-        $tokens = $phpcsFile->getTokens();
-        if (
-            $tokens[$stackPtr + 2]['type'] == 'T_STRING'
-            &&
-            (
-                $tokens[$stackPtr + 3]['type'] == 'T_OPEN_PARENTHESIS'
-                ||
-                (
-                    $tokens[$stackPtr + 3]['type'] == 'T_WHITESPACE'
-                    &&
-                    $tokens[$stackPtr + 4]['type'] == 'T_OPEN_PARENTHESIS'
-                )
-                ||
-                $tokens[$stackPtr + 3]['type'] == 'T_SEMICOLON'
-            )
-        ) {
-            $className = $tokens[$stackPtr + 2]['content'];
-            if (array_key_exists($className, $this->newClasses) === false) {
-                return;
-            }
-            $this->addError($phpcsFile, $stackPtr, $className);
+        $tokens      = $phpcsFile->getTokens();
+        $FQClassName = '';
+
+        if ($tokens[$stackPtr]['type'] === 'T_NEW') {
+            $FQClassName = $this->getFQClassNameFromNewToken($phpcsFile, $stackPtr);
+        }
+        else if ($tokens[$stackPtr]['type'] === 'T_CLASS') {
+            $FQClassName = $this->getFQExtendedClassName($phpcsFile, $stackPtr);
+        }
+        else if ($tokens[$stackPtr]['type'] === 'T_DOUBLE_COLON') {
+            $FQClassName = $this->getFQClassNameFromDoubleColonToken($phpcsFile, $stackPtr);
         }
 
+        if ($FQClassName === '') {
+            return;
+        }
 
+        if ($this->isNamespaced($FQClassName) === true) {
+            return;
+        }
+
+        $className = substr($FQClassName, 1); // Remove global namespace indicator.
+
+        if (array_key_exists($className, $this->newClasses) === false) {
+            return;
+        }
+
+        $this->addError($phpcsFile, $stackPtr, $className);
 
     }//end process()
 
 
     /**
-     * Generates the error or wanrning for this sniff.
+     * Generates the error or warning for this sniff.
      *
      * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
      * @param int                  $stackPtr  The position of the function
      *                                        in the token array.
-     * @param string               $function  The name of the function.
+     * @param string               $className The name of the class.
      * @param string               $pattern   The pattern used for the match.
      *
      * @return void
