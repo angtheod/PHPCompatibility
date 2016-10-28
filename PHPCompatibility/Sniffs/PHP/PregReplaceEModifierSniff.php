@@ -80,16 +80,28 @@ class PHPCompatibility_Sniffs_PHP_PregReplaceEModifierSniff extends PHPCompatibi
                     $firstParam++;
                 }
 
+                $doublesSeparators = array(
+                    '{' => '}',
+                );
+
                 $regex = substr($regex, 1, -1);
 
                 $regexFirstChar = substr($regex, 0, 1);
-                $regexEndPos = strrpos($regex, $regexFirstChar);
+                $regexEndPos = (array_key_exists($regexFirstChar, $doublesSeparators)) ?
+                                    strrpos($regex, $doublesSeparators[$regexFirstChar])
+                                    : strrpos($regex, $regexFirstChar);
 
-                $modifiers = substr($regex, $regexEndPos + 1);
+                if($regexEndPos) {
+                    $modifiers = substr($regex, $regexEndPos + 1);
 
-                if (strpos($modifiers, "e") !== false) {
-                    $error = 'preg_replace() - /e modifier is deprecated in PHP 5.5';
-                    $phpcsFile->addError($error, $stackPtr);
+                    if (strpos($modifiers, "e") !== false) {
+                        if ($this->supportsAbove('7.0')) {
+                            $error = 'preg_replace() - /e modifier is forbidden in PHP 7.0';
+                        } else {
+                            $error = 'preg_replace() - /e modifier is deprecated in PHP 5.5';
+                        }
+                        $phpcsFile->addError($error, $stackPtr);
+                    }
                 }
             }
         }

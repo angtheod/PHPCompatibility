@@ -33,3 +33,17 @@ function gen_one_to_three() {
         yield $i;
     }
 }
+
+$str = <<<'EOD'
+Example of string
+spanning multiple lines
+using nowdoc syntax.
+EOD;
+
+const TEST = 'Hello';
+
+__halt_compiler();
+
+bla();
+const ok = 'a';
+

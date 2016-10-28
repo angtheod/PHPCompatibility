@@ -31,6 +31,16 @@ class PHPCompatibility_Sniffs_PHP_NewKeywordsSniff extends PHPCompatibility_Snif
      * @var array(string => array(string => int|string|null))
      */
     protected $newKeywords = array(
+                                        'T_HALT_COMPILER' => array(
+                                            '5.0' => false,
+                                            '5.1' => true,
+                                            'description' => '"__halt_compiler" keyword'
+                                        ),
+                                        'T_CONST' => array(
+                                            '5.2' => false,
+                                            '5.3' => true,
+                                            'description' => '"const" keyword'
+                                        ),
                                         'T_CALLABLE' => array(
                                             '5.3' => false,
                                             '5.4' => true,
@@ -64,7 +74,7 @@ class PHPCompatibility_Sniffs_PHP_NewKeywordsSniff extends PHPCompatibility_Snif
                                         'T_USE' => array(
                                             '5.2' => false,
                                             '5.3' => true,
-                                            'description' => '"use" keyword (for traits/namespaces)'
+                                            'description' => '"use" keyword (for traits/namespaces/anonymous functions)'
                                         ),
                                         'T_TRAIT' => array(
                                             '5.3' => false,
@@ -85,6 +95,16 @@ class PHPCompatibility_Sniffs_PHP_NewKeywordsSniff extends PHPCompatibility_Snif
                                             '5.4' => false,
                                             '5.5' => true,
                                             'description' => '"finally" keyword (in exception handling)'
+                                        ),
+                                        'T_START_NOWDOC' => array(
+                                            '5.2' => false,
+                                            '5.3' => true,
+                                            'description' => 'nowdoc functionality'
+                                        ),
+                                        'T_END_NOWDOC' => array(
+                                            '5.2' => false,
+                                            '5.3' => true,
+                                            'description' => 'nowdoc functionality'
                                         ),
                                     );
 
@@ -184,7 +204,6 @@ class PHPCompatibility_Sniffs_PHP_NewKeywordsSniff extends PHPCompatibility_Snif
                 $phpcsFile->addWarning($error, $stackPtr);
             }
         }
-
     }//end addError()
 
 }//end class

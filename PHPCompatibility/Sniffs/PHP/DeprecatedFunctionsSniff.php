@@ -2,12 +2,11 @@
 /**
  * PHPCompatibility_Sniffs_PHP_DeprecatedFunctionsSniff.
  *
- * PHP version 5.6
+ * PHP version 7.0
  *
  * @category  PHP
  * @package   PHPCompatibility
  * @author    Wim Godden <wim.godden@cu.be>
- * @copyright 2014 Cu.be Solutions bvba
  */
 
 /**
@@ -16,8 +15,6 @@
  * @category  PHP
  * @package   PHPCompatibility
  * @author    Wim Godden <wim.godden@cu.be>
- * @version   1.1.0
- * @copyright 2014 Cu.be Solutions bvba
  */
 class PHPCompatibility_Sniffs_PHP_DeprecatedFunctionsSniff extends PHPCompatibility_Sniff
 {
@@ -43,6 +40,7 @@ class PHPCompatibility_Sniffs_PHP_DeprecatedFunctionsSniff extends PHPCompatibil
                                             '5.4' => false,
                                             '5.5' => false,
                                             '5.6' => false,
+                                            '7.0' => true,
                                             'alternative' => 'call_user_func'
                                         ),
                                         'call_user_method_array' => array(
@@ -50,6 +48,7 @@ class PHPCompatibility_Sniffs_PHP_DeprecatedFunctionsSniff extends PHPCompatibil
                                             '5.4' => false,
                                             '5.5' => false,
                                             '5.6' => false,
+                                            '7.0' => true,
                                             'alternative' => 'call_user_func_array'
                                         ),
                                         'define_syslog_variables' => array(
@@ -94,16 +93,49 @@ class PHPCompatibility_Sniffs_PHP_DeprecatedFunctionsSniff extends PHPCompatibil
                                             '5.6' => false,
                                             'alternative' => 'preg_replace'
                                         ),
+                                        'imagepsbbox' => array(
+                                            '7.0' => true,
+                                            'alternative' => null
+                                        ),
+                                        'imagepsencodefont' => array(
+                                            '7.0' => true,
+                                            'alternative' => null
+                                        ),
+                                        'imagepsextendfont' => array(
+                                            '7.0' => true,
+                                            'alternative' => null
+                                        ),
+                                        'imagepsfreefont' => array(
+                                            '7.0' => true,
+                                            'alternative' => null
+                                        ),
+                                        'imagepsloadfont' => array(
+                                            '7.0' => true,
+                                            'alternative' => null
+                                        ),
+                                        'imagepsslantfont' => array(
+                                            '7.0' => true,
+                                            'alternative' => null
+                                        ),
+                                        'imagepstext' => array(
+                                            '7.0' => true,
+                                            'alternative' => null
+                                        ),
                                         'import_request_variables' => array(
                                             '5.4' => true,
                                             '5.5' => true,
                                             '5.6' => false,
                                             'alternative' => null
                                         ),
+                                        'ldap_sort' => array(
+                                            '7.0' => false,
+                                            'alternative' => null
+                                        ),
                                         'mcrypt_generic_end' => array(
                                             '5.4' => false,
                                             '5.5' => false,
                                             '5.6' => false,
+                                            '7.0' => true,
                                             'alternative' => 'mcrypt_generic_deinit'
                                         ),
                                         'mysql_db_query' => array(
@@ -173,6 +205,7 @@ class PHPCompatibility_Sniffs_PHP_DeprecatedFunctionsSniff extends PHPCompatibil
                                             '5.4' => false,
                                             '5.5' => false,
                                             '5.6' => false,
+                                            '7.0' => true,
                                             'alternative' => null
                                         ),
                                         'session_register' => array(
@@ -198,9 +231,10 @@ class PHPCompatibility_Sniffs_PHP_DeprecatedFunctionsSniff extends PHPCompatibil
                                         ),
                                         'set_magic_quotes_runtime' => array(
                                             '5.3' => false,
-                                            '5.4' => true,
-                                            '5.5' => true,
-                                            '5.6' => true,
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            '7.0' => true,
                                             'alternative' => null
                                         ),
                                         'set_socket_blocking' => array(
@@ -208,6 +242,7 @@ class PHPCompatibility_Sniffs_PHP_DeprecatedFunctionsSniff extends PHPCompatibil
                                             '5.4' => false,
                                             '5.5' => false,
                                             '5.6' => false,
+                                            '7.0' => true,
                                             'alternative' => 'stream_set_blocking'
                                         ),
                                         'split' => array(
@@ -254,27 +289,326 @@ class PHPCompatibility_Sniffs_PHP_DeprecatedFunctionsSniff extends PHPCompatibil
                                         'datefmt_set_timezone_id' => array(
                                             '5.5' => false,
                                             '5.6' => false,
+                                            '7.0' => true,
                                             'alternative' => 'datefmt_set_timezone'
                                         ),
                                         'mcrypt_ecb' => array(
                                             '5.5' => false,
                                             '5.6' => false,
+                                            '7.0' => true,
                                             'alternative' => null
                                         ),
                                         'mcrypt_cbc' => array(
                                             '5.5' => false,
                                             '5.6' => false,
+                                            '7.0' => true,
                                             'alternative' => null
                                         ),
                                         'mcrypt_cfb' => array(
                                             '5.5' => false,
                                             '5.6' => false,
+                                            '7.0' => true,
                                             'alternative' => null
                                         ),
                                         'mcrypt_ofb' => array(
                                             '5.5' => false,
                                             '5.6' => false,
+                                            '7.0' => true,
                                             'alternative' => null
+                                        ),
+                                        'ocibindbyname' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_bind_by_name'
+                                        ),
+                                        'ocicancel' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_cancel'
+                                        ),
+                                        'ocicloselob' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Lob::close'
+                                        ),
+                                        'ocicollappend' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Collection::append'
+                                        ),
+                                        'ocicollassign' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Collection::assign'
+                                        ),
+                                        'ocicollassignelem' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Collection::assignElem'
+                                        ),
+                                        'ocicollgetelem' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Collection::getElem'
+                                        ),
+                                        'ocicollmax' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Collection::max'
+                                        ),
+                                        'ocicollsize' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Collection::size'
+                                        ),
+                                        'ocicolltrim' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Collection::trim'
+                                        ),
+                                        'ocicolumnisnull' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_field_is_null'
+                                        ),
+                                        'ocicolumnname' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_field_name'
+                                        ),
+                                        'ocicolumnprecision' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_field_precision'
+                                        ),
+                                        'ocicolumnscale' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_field_scale'
+                                        ),
+                                        'ocicolumnsize' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_field_size'
+                                        ),
+                                        'ocicolumntype' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_field_type'
+                                        ),
+                                        'ocicolumntyperaw' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_field_type_raw'
+                                        ),
+                                        'ocicommit' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_commit'
+                                        ),
+                                        'ocidefinebyname' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_define_by_name'
+                                        ),
+                                        'ocierror' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_error'
+                                        ),
+                                        'ociexecute' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_execute'
+                                        ),
+                                        'ocifetch' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_fetch'
+                                        ),
+                                        'ocifetchinto' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => null
+                                        ),
+                                        'ocifetchstatement' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_fetch_all'
+                                        ),
+                                        'ocifreecollection' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Collection::free'
+                                        ),
+                                        'ocifreecursor' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_free_statement'
+                                        ),
+                                        'ocifreedesc' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Lob::free'
+                                        ),
+                                        'ocifreestatement' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_free_statement'
+                                        ),
+                                        'ociinternaldebug' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_internal_debug'
+                                        ),
+                                        'ociloadlob' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Lob::load'
+                                        ),
+                                        'ocilogoff' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_close'
+                                        ),
+                                        'ocilogon' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_connect'
+                                        ),
+                                        'ocinewcollection' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_new_collection'
+                                        ),
+                                        'ocinewcursor' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_new_cursor'
+                                        ),
+                                        'ocinewdescriptor' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_new_descriptor'
+                                        ),
+                                        'ocinlogon' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_new_connect'
+                                        ),
+                                        'ocinumcols' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_num_fields'
+                                        ),
+                                        'ociparse' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_parse'
+                                        ),
+                                        'ociplogon' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_pconnect'
+                                        ),
+                                        'ociresult' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_result'
+                                        ),
+                                        'ocirollback' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_rollback'
+                                        ),
+                                        'ocirowcount' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_num_rows'
+                                        ),
+                                        'ocisavelob' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Lob::save'
+                                        ),
+                                        'ocisavelobfile' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Lob::import'
+                                        ),
+                                        'ociserverversion' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_server_version'
+                                        ),
+                                        'ocisetprefetch' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_set_prefetch'
+                                        ),
+                                        'ocistatementtype' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'oci_statement_type'
+                                        ),
+                                        'ociwritelobtofile' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Lob::export'
+                                        ),
+                                        'ociwritetemporarylob' => array(
+                                            '5.4' => false,
+                                            '5.5' => false,
+                                            '5.6' => false,
+                                            'alternative' => 'OCI-Lob::writeTemporary'
                                         ),
                                     );
 
