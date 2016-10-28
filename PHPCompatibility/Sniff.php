@@ -238,10 +238,35 @@ abstract class PHPCompatibility_Sniff implements PHP_CodeSniffer_Sniff
             return 0;
         }
 
+        return count($this->getFunctionCallParameters($phpcsFile, $stackPtr));
+    }
+
+
+    /**
+     * Get information on all parameters passed to a function call.
+     *
+     * Expects to be passed the T_STRING stack pointer for the function call.
+     * If passed a T_STRING which is *not* a function call, the behaviour is unreliable.
+     *
+     * Will return an multi-dimentional array with the start token pointer, end token
+     * pointer and raw parameter value for all parameters. Index will be 1-based.
+     * If no parameters are found, will return an empty array.
+     *
+     * @param PHP_CodeSniffer_File $phpcsFile     The file being scanned.
+     * @param int                  $stackPtr      The position of the function call token.
+     *
+     * @return array
+     */
+    public function getFunctionCallParameters(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
+    {
+        if ($this->doesFunctionCallHaveParameters($phpcsFile, $stackPtr) === false) {
+            return array();
+        }
+
         // Ok, we know we have a T_STRING with parameters and valid open & close parenthesis.
         $tokens = $phpcsFile->getTokens();
 
-        $openParenthesis = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, $stackPtr + 1, null, true, null, true);
+        $openParenthesis  = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, $stackPtr + 1, null, true, null, true);
         $closeParenthesis = $tokens[$openParenthesis]['parenthesis_closer'];
 
         // Which nesting level is the one we are interested in ?
@@ -250,29 +275,144 @@ abstract class PHPCompatibility_Sniff implements PHP_CodeSniffer_Sniff
             $nestedParenthesisCount = count($tokens[$openParenthesis]['nested_parenthesis']) + 1;
         }
 
-        $nextComma = $openParenthesis;
-        $cnt = 0;
-        while ($nextComma = $phpcsFile->findNext(array(T_COMMA, T_CLOSE_PARENTHESIS), $nextComma + 1, $closeParenthesis + 1)) {
+        $parameters = array();
+        $nextComma  = $openParenthesis;
+        $paramStart = $openParenthesis + 1;
+        $cnt        = 1;
+        while ($nextComma = $phpcsFile->findNext(array(T_COMMA, T_CLOSE_PARENTHESIS, T_OPEN_SHORT_ARRAY), $nextComma + 1, $closeParenthesis + 1)) {
+            // Ignore anything within short array definition brackets.
+            if (
+                $tokens[$nextComma]['type'] === 'T_OPEN_SHORT_ARRAY'
+                &&
+                ( isset($tokens[$nextComma]['bracket_opener']) && $tokens[$nextComma]['bracket_opener'] === $nextComma )
+                &&
+                isset($tokens[$nextComma]['bracket_closer'])
+            ) {
+                // Skip forward to the end of the short array definition.
+                $nextComma = $tokens[$nextComma]['bracket_closer'];
+                continue;
+            }
+
             // Ignore comma's at a lower nesting level.
             if (
-                $tokens[$nextComma]['type'] == 'T_COMMA'
+                $tokens[$nextComma]['type'] === 'T_COMMA'
                 &&
                 isset($tokens[$nextComma]['nested_parenthesis'])
                 &&
-                count($tokens[$nextComma]['nested_parenthesis']) != $nestedParenthesisCount
+                count($tokens[$nextComma]['nested_parenthesis']) !== $nestedParenthesisCount
             ) {
                 continue;
             }
 
             // Ignore closing parenthesis if not 'ours'.
-            if ($tokens[$nextComma]['type'] == 'T_CLOSE_PARENTHESIS' && $nextComma != $closeParenthesis) {
+            if ($tokens[$nextComma]['type'] === 'T_CLOSE_PARENTHESIS' && $nextComma !== $closeParenthesis) {
                 continue;
             }
 
+            // Ok, we've reached the end of the parameter.
+            $parameters[$cnt]['start'] = $paramStart;
+            $parameters[$cnt]['end']   = $nextComma - 1;
+            $parameters[$cnt]['raw']   = trim($phpcsFile->getTokensAsString($paramStart, ($nextComma - $paramStart)));
+
+            // Check if there are more tokens before the closing parenthesis.
+            // Prevents code like the following from setting a third parameter:
+            // functionCall( $param1, $param2, );
+            $hasNextParam = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, $nextComma + 1, $closeParenthesis, true, null, true);
+            if ($hasNextParam === false) {
+                break;
+            }
+
+            // Prepare for the next parameter.
+            $paramStart = $nextComma + 1;
             $cnt++;
         }
 
-        return $cnt;
+        return $parameters;
+    }
+
+
+    /**
+     * Get information on a specific parameter passed to a function call.
+     *
+     * Expects to be passed the T_STRING stack pointer for the function call.
+     * If passed a T_STRING which is *not* a function call, the behaviour is unreliable.
+     *
+     * Will return a array with the start token pointer, end token pointer and the raw value
+     * of the parameter at a specific offset.
+     * If the specified parameter is not found, will return false.
+     *
+     * @param PHP_CodeSniffer_File $phpcsFile   The file being scanned.
+     * @param int                  $stackPtr    The position of the function call token.
+     * @param int                  $paramOffset The 1-based index position of the parameter to retrieve.
+     *
+     * @return array|false
+     */
+    public function getFunctionCallParameter(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $paramOffset)
+    {
+        $parameters = $this->getFunctionCallParameters($phpcsFile, $stackPtr);
+
+        if (isset($parameters[$paramOffset]) === false) {
+            return false;
+        }
+        else {
+            return $parameters[$paramOffset];
+        }
+    }
+
+
+    /**
+     * Verify whether a token is within a scoped condition.
+     *
+     * If the optional $validScopes parameter has been passed, the function
+     * will check that the token has at least one condition which is of a
+     * type defined in $validScopes.
+     *
+     * @param PHP_CodeSniffer_File $phpcsFile   The file being scanned.
+     * @param int                  $stackPtr    The position of the token.
+     * @param array|int            $validScopes Optional. Array of valid scopes
+     *                                          or int value of a valid scope.
+     *
+     * @return bool Without the optional $scopeTypes: True if within a scope, false otherwise.
+     *              If the $scopeTypes are set: True if *one* of the conditions is a
+     *              valid scope, false otherwise.
+     */
+    public function tokenHasScope(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $validScopes = null)
+    {
+        $tokens = $phpcsFile->getTokens();
+
+        // Check for the existence of the token.
+        if (isset($tokens[$stackPtr]) === false) {
+            return false;
+        }
+
+        // No conditions = no scope.
+        if (empty($tokens[$stackPtr]['conditions'])) {
+            return false;
+        }
+
+        // Ok, there are conditions, do we have to check for specific ones ?
+        if (isset($validScopes) === false) {
+            return true;
+        }
+
+        if (is_int($validScopes)) {
+            // Received an integer, so cast to array.
+            $validScopes = (array) $validScopes;
+        }
+
+        if (empty($validScopes) || is_array($validScopes) === false) {
+            // No valid scope types received, so will not comply.
+            return false;
+        }
+
+        // Check for required scope types.
+        foreach ($tokens[$stackPtr]['conditions'] as $pointer => $type) {
+            if (in_array($type, $validScopes, true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
@@ -289,32 +429,13 @@ abstract class PHPCompatibility_Sniff implements PHP_CodeSniffer_Sniff
      */
     public function inClassScope(PHP_CodeSniffer_File $phpcsFile, $stackPtr, $strict = true)
     {
-        $tokens = $phpcsFile->getTokens();
-
-        // Check for the existence of the token.
-        if (isset($tokens[$stackPtr]) === false) {
-            return false;
-        }
-
-        // No conditions = no scope.
-        if (empty($tokens[$stackPtr]['conditions'])) {
-            return false;
-        }
-
-        $validScope = array(T_CLASS);
+        $validScopes = array(T_CLASS);
         if ($strict === false) {
-            $validScope[] = T_INTERFACE;
-            $validScope[] = T_TRAIT;
+            $validScopes[] = T_INTERFACE;
+            $validScopes[] = T_TRAIT;
         }
 
-        // Check for class scope.
-        foreach ($tokens[$stackPtr]['conditions'] as $pointer => $type) {
-            if (in_array($type, $validScope, true)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->tokenHasScope($phpcsFile, $stackPtr, $validScopes);
     }
 
 
@@ -348,7 +469,12 @@ abstract class PHPCompatibility_Sniff implements PHP_CodeSniffer_Sniff
                  T_WHITESPACE,
                 );
 
-        $start     = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, $stackPtr + 1, null, true, null, true);
+        $start = $phpcsFile->findNext(PHP_CodeSniffer_Tokens::$emptyTokens, $stackPtr + 1, null, true, null, true);
+        // Bow out if the next token is a variable as we don't know where it was defined.
+        if ($tokens[$start]['code'] === T_VARIABLE) {
+            return '';
+        }
+
         $end       = $phpcsFile->findNext($find, ($start + 1), null, true, null, true);
         $className = $phpcsFile->getTokensAsString($start, ($end - $start));
         $className = trim($className);
@@ -411,6 +537,11 @@ abstract class PHPCompatibility_Sniff implements PHP_CodeSniffer_Sniff
         }
 
         if ($tokens[$stackPtr]['code'] !== T_DOUBLE_COLON) {
+            return '';
+        }
+
+        // Nothing to do if previous token is a variable as we don't know where it was defined.
+        if ($tokens[$stackPtr - 1]['code'] === T_VARIABLE) {
             return '';
         }
 

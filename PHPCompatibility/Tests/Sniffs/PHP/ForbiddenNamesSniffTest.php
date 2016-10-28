@@ -29,11 +29,12 @@ class ForbiddenNamesSniffTest extends BaseSniffTest
     /**
      * testNamespace
      *
+     * @group forbiddenNames
+     *
      * @dataProvider usecaseProvider
      */
     public function testForbiddenNames($usecase)
     {
-
 
         // These use cases were generated using the PHP script
         // `generate-forbidden-names-test-files` in sniff-examples
@@ -88,6 +89,8 @@ class ForbiddenNamesSniffTest extends BaseSniffTest
             array('function-declare'),
             array('const'),
             array('define'),
+            array('interface'),
+            array('interface-extends'),
         );
         if (version_compare(phpversion(), '5.3', '>=')) {
             $data[] = array('namespace');
@@ -98,6 +101,8 @@ class ForbiddenNamesSniffTest extends BaseSniffTest
 
     /**
      * testCorrectUsageOfKeywords
+     *
+     * @group forbiddenNames
      *
      * @return void
      */
@@ -114,12 +119,14 @@ class ForbiddenNamesSniffTest extends BaseSniffTest
     /**
      * Test setting test version option
      *
+     * @group forbiddenNames
+     *
      * @return void
      */
     public function testSettingTestVersion()
     {
-        $file = $this->sniffFile("sniff-examples/forbidden-names/class.php", "5.2");
+        $file = $this->sniffFile("sniff-examples/forbidden-names/class.php", '4.4');
 
-        $this->assertNoViolation($file, 8);
+        $this->assertNoViolation($file, 3);
     }
 }
