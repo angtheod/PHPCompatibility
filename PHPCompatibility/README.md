@@ -2,6 +2,7 @@ PHP Compatibility Coding Standard for PHP_CodeSniffer
 =====================================================
 [![Flattr this git repo](http://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=wimg&url=https://github.com/wimg/PHPCompatibility&title=PHPCompatibility&language=&tags=github&category=software)
 [![Build Status](https://travis-ci.org/wimg/PHPCompatibility.png?branch=master)](https://travis-ci.org/wimg/PHPCompatibility)
+[![Coverage Status](https://coveralls.io/repos/github/wimg/PHPCompatibility/badge.svg?branch=master)](https://coveralls.io/github/wimg/PHPCompatibility?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/wimg/php-compatibility/v/stable.png)](https://packagist.org/packages/wimg/php-compatibility)
 [![Latest Unstable Version](https://poser.pugx.org/wimg/php-compatibility/v/unstable.png)](https://packagist.org/packages/wimg/php-compatibility)
 [![License](https://poser.pugx.org/wimg/php-compatibility/license.png)](https://packagist.org/packages/wimg/php-compatibility)
@@ -20,8 +21,8 @@ Thanks to [![WPEngine](https://cu.be/img/wpengine.png)](http://wpengine.com) for
 Installation (method 1)
 -----------------------
 
-* Install [PHP_CodeSniffer](http://pear.php.net/PHP_CodeSniffer) with `pear install PHP_CodeSniffer` (PHP_CodeSniffer 1.5.1 or later is required for full support, notices may be thrown on older versions).
-* Checkout this repository as `PHPCompatibility` into the `PHP/CodeSniffer/Standards` directory.
+* Install [PHP_CodeSniffer](http://pear.php.net/PHP_CodeSniffer) with `pear install PHP_CodeSniffer` (PHP_CodeSniffer 1.5.1 is required for 90% of the sniffs, 2.6 or later is required for full support, notices may be thrown on older versions).
+* Checkout the latest release from https://github.com/wimg/PHPCompatibility/releases into the `PHP/CodeSniffer/Standards/PHPCompatibility` directory.
 
 
 Installation in Composer project (method 2)
@@ -32,7 +33,7 @@ Installation in Composer project (method 2)
 ```json
 "require-dev": {
    "squizlabs/php_codesniffer": "*",
-   "wimg/php-compatibility": "dev-master",
+   "wimg/php-compatibility": "*",
    "simplyadmire/composer-plugins" : "@dev",
    "prefer-stable" : true
 },
