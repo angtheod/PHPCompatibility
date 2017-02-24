@@ -9,6 +9,11 @@
 /**
  * Deprecated ini directives sniff tests
  *
+ * @group deprecatedIniDirectives
+ * @group iniDirectives
+ *
+ * @covers PHPCompatibility_Sniffs_PHP_DeprecatedIniDirectivesSniff
+ *
  * @uses BaseSniffTest
  * @package PHPCompatibility
  * @author Jansen Price <jansen.price@gmail.com>
@@ -19,24 +24,45 @@ class DeprecatedIniDirectivesSniffTest extends BaseSniffTest
     const TEST_FILE = 'sniff-examples/deprecated_ini_directives.php';
 
     /**
-     * Test valid directive
+     * testNoFalsePositives
      *
-     * @group IniDirectives
+     * @dataProvider dataNoFalsePositives
+     *
+     * @param int $line The line number.
      *
      * @return void
      */
-    public function testValidDirective()
+    public function testNoFalsePositives($line)
     {
         $file = $this->sniffFile(self::TEST_FILE);
-        $this->assertNoViolation($file, 57);
-        $this->assertNoViolation($file, 58);
-        $this->assertNoViolation($file, 133);
+        $this->assertNoViolation($file, $line);
     }
 
     /**
-     * testDeprecatedRemovedDirectives
+     * Data provider.
      *
-     * @group IniDirectives
+     * @see testNoFalsePositives()
+     *
+     * @return array
+     */
+    public function dataNoFalsePositives()
+    {
+        return array(
+            array(57),
+            array(58),
+            array(133),
+            array(155),
+            array(156),
+            array(159),
+            array(160),
+            array(163),
+            array(164),
+        );
+    }
+
+
+    /**
+     * testDeprecatedRemovedDirectives
      *
      * @dataProvider dataDeprecatedRemovedDirectives
      *
@@ -115,8 +141,6 @@ class DeprecatedIniDirectivesSniffTest extends BaseSniffTest
     /**
      * testDeprecatedDirectives
      *
-     * @group IniDirectives
-     *
      * @dataProvider dataDeprecatedDirectives
      *
      * @param string $iniName           Name of the ini directive.
@@ -175,8 +199,6 @@ class DeprecatedIniDirectivesSniffTest extends BaseSniffTest
     /**
      * testRemovedWithAlternative
      *
-     * @group IniDirectives
-     *
      * @dataProvider dataRemovedWithAlternative
      *
      * @param string $iniName        Name of the ini directive.
@@ -224,8 +246,6 @@ class DeprecatedIniDirectivesSniffTest extends BaseSniffTest
 
     /**
      * testRemovedDirectives
-     *
-     * @group IniDirectives
      *
      * @dataProvider dataRemovedDirectives
      *

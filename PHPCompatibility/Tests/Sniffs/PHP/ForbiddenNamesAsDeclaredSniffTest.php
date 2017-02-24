@@ -9,6 +9,11 @@
 /**
  * Forbidden names as declared name for class, interface, trait or namespace.
  *
+ * @group forbiddenNamesAsDeclared
+ * @group reservedKeywords
+ *
+ * @covers PHPCompatibility_Sniffs_PHP_ForbiddenNamesAsDeclaredSniff
+ *
  * @uses    BaseSniffTest
  * @package PHPCompatibility
  * @author  Juliette Reinders Folmer <phpcompatibility_nospam@adviesenzo.nl>
@@ -20,8 +25,6 @@ class ForbiddenNamesAsDeclaredSniffTest extends BaseSniffTest
 
     /**
      * testReservedKeyword
-     *
-     * @group forbiddenNamesAsDeclared
      *
      * @dataProvider dataReservedKeyword
      *
@@ -74,8 +77,6 @@ class ForbiddenNamesAsDeclaredSniffTest extends BaseSniffTest
 
     /**
      * testNoViolation
-     *
-     * @group forbiddenNamesAsDeclared
      *
      * @dataProvider dataNoViolation
      *

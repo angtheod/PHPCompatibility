@@ -9,6 +9,11 @@
 /**
  * Removed extensions sniff tests
  *
+ * @group removedExtensions
+ * @group extensions
+ *
+ * @covers PHPCompatibility_Sniffs_PHP_RemovedExtensionsSniff
+ *
  * @uses BaseSniffTest
  * @package PHPCompatibility
  * @author Jansen Price <jansen.price@gmail.com>
@@ -26,11 +31,11 @@ class RemovedExtensionsSniffTest extends BaseSniffTest
     protected $_sniffFile;
 
     /**
-     * setUp
+     * Set up the test file for some of these unit tests.
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -40,8 +45,6 @@ class RemovedExtensionsSniffTest extends BaseSniffTest
 
     /**
      * testRemovedExtension
-     *
-     * @group removedExtensions
      *
      * @dataProvider dataRemovedExtension
      *
@@ -102,8 +105,6 @@ class RemovedExtensionsSniffTest extends BaseSniffTest
     /**
      * testRemovedExtensionWithAlternative
      *
-     * @group removedExtensions
-     *
      * @dataProvider dataRemovedExtensionWithAlternative
      *
      * @param string $extensionName  Name of the PHP extension.
@@ -163,8 +164,6 @@ class RemovedExtensionsSniffTest extends BaseSniffTest
     /**
      * testDeprecatedRemovedExtensionWithAlternative
      *
-     * @group removedExtensions
-     *
      * @dataProvider dataDeprecatedRemovedExtensionWithAlternative
      *
      * @param string $extensionName     Name of the PHP extension.
@@ -218,7 +217,7 @@ class RemovedExtensionsSniffTest extends BaseSniffTest
     public function dataDeprecatedRemovedExtensionWithAlternative()
     {
         return array(
-            array('ereg', '5.3', '7.0', 'pcre', array(65), '5.2'),
+            array('ereg', '5.3', '7.0', 'pcre', array(65, 76), '5.2'),
             array('mysql_', '5.5', '7.0', 'mysqli', array(38), '5.4'),
         );
     }
@@ -226,8 +225,6 @@ class RemovedExtensionsSniffTest extends BaseSniffTest
 
     /**
      * testDeprecatedExtensionWithAlternative
-     *
-     * @group removedExtensions
      *
      * @dataProvider dataDeprecatedExtensionWithAlternative
      *
@@ -275,62 +272,39 @@ class RemovedExtensionsSniffTest extends BaseSniffTest
 
 
     /**
-     * testNotAFunctionCall
+     * testNoFalsePositives
      *
-     * @group removedExtensions
+     * @dataProvider dataNoFalsePositives
+     *
+     * @param int $line The line number.
      *
      * @return void
      */
-    public function testNotAFunctionCall()
+    public function testNoFalsePositives($line)
     {
-        $this->assertNoViolation($this->_sniffFile, 57);
+        $file = $this->sniffFile(self::TEST_FILE);
+        $this->assertNoViolation($file, $line);
     }
 
     /**
-     * testFunctionDeclaration
+     * Data provider.
      *
-     * @group removedExtensions
+     * @see testNoFalsePositives()
      *
-     * @return void
+     * @return array
      */
-    public function testFunctionDeclaration()
+    public function dataNoFalsePositives()
     {
-        $this->assertNoViolation($this->_sniffFile, 58);
+        return array(
+            array(57), // Not a function call.
+            array(58), // Function declaration.
+            array(59), // Class instantiation.
+            array(60), // Method call.
+            array(68), // Whitelisted function.
+            array(74), // Whitelisted function array.
+            array(75), // Whitelisted function array.
+            array(78), // Live coding
+        );
     }
 
-    /**
-     * testNewClass
-     *
-     * @group removedExtensions
-     *
-     * @return void
-     */
-    public function testNewClass()
-    {
-        $this->assertNoViolation($this->_sniffFile, 59);
-    }
-
-    /**
-     * testMethod
-     *
-     * @group removedExtensions
-     *
-     * @return void
-     */
-    public function testMethod()
-    {
-        $this->assertNoViolation($this->_sniffFile, 60);
-    }
-
-    /**
-     * testWhiteListing
-     *
-     * @group removedExtensions
-     *
-     * @return void
-     */
-    public function testWhiteListing()
-    {
-        $this->assertNoViolation($this->_sniffFile, 68);
-    }
 }
